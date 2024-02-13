@@ -26,23 +26,23 @@ import jakarta.validation.Valid;
 @RestController	
 public class UserJpaResource {
 	
-	private UserRepository repository;
+	private UserRepository userRepository;
 	
 	private PostRepository postRepository;
 	
-	public UserJpaResource(UserRepository repository, PostRepository postRepository) {
-		this.repository = repository;
+	public UserJpaResource(UserRepository userRepository, PostRepository postRepository) {
+		this.userRepository = userRepository;
 		this.postRepository = postRepository;
 	}
 	
 	@GetMapping(path = "/jpa/users")
 	public List<User> retrieveAllUsers() {
-		return repository.findAll();
+		return userRepository.findAll();
 	}
 	
 	@GetMapping(path = "/jpa/users/{id}")
 	public EntityModel<User> retrieveUserById(@PathVariable Integer id) {
-		Optional<User> user = repository.findById(id);
+		Optional<User> user = userRepository.findById(id);
 		if (user.isEmpty()) 
 			throw new UserNotFoundException("id:"+id);
 		
@@ -56,7 +56,7 @@ public class UserJpaResource {
 	
 	@PostMapping(path = "/jpa/users")
 	public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
-		User savedUser = repository.save(user);
+		User savedUser = userRepository.save(user);
 		URI location = ServletUriComponentsBuilder.fromCurrentRequest()
 						.path("/{id}")
 						.buildAndExpand(savedUser.getId())
@@ -66,12 +66,12 @@ public class UserJpaResource {
 	
 	@DeleteMapping(path = "/jpa/users/{id}")
 	public void deleteUser(@PathVariable int id) {
-		repository.deleteById(id);
+		userRepository.deleteById(id);
 	}
 	
 	@GetMapping(path = "/jpa/users/{id}/posts")
 	public List<Post> retrievePostsForUser(@PathVariable Integer id) {
-		Optional<User> user = repository.findById(id);
+		Optional<User> user = userRepository.findById(id);
 		
 		if(user.isEmpty())
 			throw new UserNotFoundException("id:"+id);
@@ -81,7 +81,7 @@ public class UserJpaResource {
 	
 	@PostMapping(path = "/jpa/users/{id}/posts")
 	public ResponseEntity<Post> createPostForUser(@PathVariable Integer id, @Valid @RequestBody Post post) {
-		Optional<User> user = repository.findById(id);
+		Optional<User> user = userRepository.findById(id);
 		
 		if(user.isEmpty())
 			throw new UserNotFoundException("id:"+id);
